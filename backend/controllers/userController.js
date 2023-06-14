@@ -17,7 +17,7 @@ const registerUser = asyncHandler(async (req, res) => {
   if (user) {
     res.status(201).json({
       _id: user._id,
-      fname: user.name,
+      name: user.name,
       email: user.email,
       password: user.password,
       pic: user.pic,
@@ -39,6 +39,7 @@ const authuser = asyncHandler(async (req,res) => {
       _id: user.id,
       name: user.name,
       email: user.email,
+      pic:user.pic,
       token : jwt(user._id),
     });
   } else {
@@ -47,6 +48,8 @@ const authuser = asyncHandler(async (req,res) => {
 
 });
 
+
+// /user?search="rohan"
 const allUsers= asyncHandler(async(req,res)=>{
   const key = req.query.search
   ?{$or:[

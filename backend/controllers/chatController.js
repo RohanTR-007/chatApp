@@ -21,19 +21,16 @@ const acessChat = asyncHandler(async (req, res) => {
       .populate("users", "-password")
       .populate("latestMessage");
 
-    //     console.log(isChat)
-    //   isChat = await User.populate(isChat, {
-    //     path: "latestMessage.sender",
-    //     select:"name email pic"
-    //   });
-    console.log("------------");
-    console.log(isChat);
+      isChat = await User.populate(isChat, {
+        path: "latestMessage.sender",
+        select:"name email pic"
+      });
   } catch (err) {
     res.status(401).json("Requested userID Doesn't exist");
   }
   if (isChat.length > 0) {
     res.status(200);
-    res.send(isChat);
+    res.send(isChat[0]);
   } else {
     chatData = {
       chatName: "sender",
@@ -42,7 +39,7 @@ const acessChat = asyncHandler(async (req, res) => {
     };
     try {
       const createChat = await Chat.create(chatData);
-      const newChat = await Chat.find({ _id: createChat._id }).populate(
+      const newChat = await Chat.findOne({ _id: createChat._id }).populate(
         "users",
         "-password"
       ); //populate
@@ -55,22 +52,56 @@ const acessChat = asyncHandler(async (req, res) => {
   }
 });
 
+
 const fetchChats = asyncHandler(async (req, res) => {
   try {
-    const chatRes = await Chat.find({
-      users: { $elemMatch: { $eq: req.user._id } },
-    })
-      .populate("users", "-password")
+    Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
+      .populate("users", "-Password")
       .populate("latestMessage")
-      .populate("groupAdmin", "-password")
-      .sort({ updatedAt: -1 });
-    res.send(chatRes);
-    re.status(200);
-  } catch (err) {
+      .populate("groupAdmin", "-Password")
+      .sort({ updatedAt: -1 })
+      .then(async (results) => {
+        results = await User.populate(results, {
+          path: "latestMessage.sender",
+          select: "name, pic, email",
+        });
+        res.status(200);
+        res.send(results);
+      });
+  } catch (error) {
     res.status(400);
-    res.send(err.message);
+    throw new Error(error.message);
   }
 });
+
+
+
+
+
+
+
+// const fetchChats = asyncHandler(async (req, res) => {
+
+//   try {
+//    await Chat.find({
+//       users: { $elemMatch: { $eq: req.user._id } },
+//     })
+//       .populate("users", "-password")
+//       .populate("latestMessage")
+//       .populate("groupAdmin", "-password")
+//       .sort({ updatedAt: -1 })
+//       .then(async (results) => {
+//                 results = await User.populate(results, {
+//                     path: 'latestMessage.sender',
+//                     select: 'name, pic, email'
+//                 })
+//     res.send(results);
+//     res.status(200);
+//     })} catch (err) {
+//     res.status(400);
+//     res.send(err.message);
+//   }
+// });
 
 const createGroup = asyncHandler(async (req, res) => {
   var { name, users } = req.body;

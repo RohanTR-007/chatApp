@@ -1,4 +1,6 @@
 import React from "react";
+import { useEffect  } from "react";
+import {useHistory} from "react-router-dom"
 import {
   Container,
   Box,
@@ -10,11 +12,18 @@ import {
   TabPanel,
 } from "@chakra-ui/react";
 import "./index.css";
-import "../components/authentcation/Login";
-import "../components/authentcation/SignUp";
 import Login from "../components/authentcation/Login";
 import SignUp from "../components/authentcation/SignUp";
-const home = () => {
+const Home = () => {
+  
+    const  history = useHistory()
+    useEffect(() => {
+      const userinfo = JSON.parse(localStorage.getItem("userInfo"));
+      if(userinfo) {
+        history.push("/chats");
+      }
+    }, [history]);
+
   return (
     <Container>
       <Box className="box">
@@ -40,4 +49,4 @@ const home = () => {
   );
 };
 
-export default home;
+export default Home;
