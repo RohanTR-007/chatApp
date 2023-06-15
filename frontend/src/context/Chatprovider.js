@@ -9,12 +9,13 @@ const Chatprovider =({children})=>
     const [SelectedChat, setSelectedChat] = useState()
     const [chats, setchats] = useState([])
     const history = useHistory()
-    
+
     useEffect(() => {
       const userinfo = JSON.parse(localStorage.getItem("userInfo"));
       setuser(userinfo);
       if (!userinfo) {
         history.push("/")
+        
       } 
     //   else
     //   {
